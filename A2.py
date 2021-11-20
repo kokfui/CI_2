@@ -5,7 +5,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import vis
-jobs = pd.read_csv('Assignment2/Employee.csv')
+jobs = pd.read_csv('Employee.csv')
 print(jobs.head())
 
 # Replace linguistic variables with numerical values
