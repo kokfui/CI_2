@@ -1,10 +1,10 @@
-import matplotlib.pyplot as plt
-import numpy as np
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import pandas as pd
-import vis
+
+#import dataset
 jobs = pd.read_csv('Employee.csv')
 print(jobs.head())
 
@@ -27,50 +27,27 @@ jobs['City'] = jobs['City'].replace(to_replace= "New Delhi", value= 2)
 print(jobs.head())
 
 # Optimize for Leave or Not
-x = jobs[jobs.columns[3::6]]
+x = jobs.drop(columns=['LeaveOrNot'], axis=1)
 y = jobs["LeaveOrNot"]
 
+#Data partition
 X_train, X_test, y_train, y_test = train_test_split(x, y, train_size=0.8)
 
-print(X_train)
-print(X_test)
-
+#Scaling data
 scaler = StandardScaler()
 scaler.fit(X_train)
 X_train = scaler.transform(X_train)
 X_test = scaler.transform(X_test)
 
-mlp = MLPClassifier(hidden_layer_sizes=(2), max_iter=1000)
+#Classification modelling with 3 hidden layers and 8 neurons in each hidden layer
+mlp = MLPClassifier(hidden_layer_sizes=(8,8,8), max_iter=1000)
 mlp.fit(X_train, y_train)
+y_pred = mlp.predict(X_test)
 
-#Visualization 
-fig = plt.figure()
-ax = fig.add_subplot(1,1,1)
-
-vis.vis2d(ax, mlp, X_train, y_train, X_test, y_test)
-
-# activation_functions = ['identity','logistic','tanh','relu']
-# fig = plt.figure()
-# hidden_layers = [(3), (3,3), (3,3,3)]
-
-# activation_functions = ['identity', 'logistic', 'tanh', 'relu']
-# hidden_layers = [(3), (3,3), (3,3,3)]
-# fig = plt.figure()
-# for i,actfcn in enumerate(activation_functions):
-#   for j,hlyr in enumerate(hidden_layers):
-#     mlp = MLPClassifier(hidden_layer_sizes=hlyr, activation=actfcn, max_iter=1000)
-#     mlp.fit(X_train, y_train)
-#     ax = fig.add_subplot(len(hidden_layers), len(activation_functions), j*len(activation_functions)+i+1)
-#     ax.set_title('{},{},{}'.format(actfcn,str(hlyr),round(mlp.score(X_test,y_test),2)))
-#     vis.vis2d(ax, mlp, X_train, y_train, X_test, y_test)
-#     ax.set_xticks([])
-#     ax.set_yticks([])
-
-# fig = plt.figure()
-# axes = vis.vis3d(fig, mlp, X_train, y_train, X_test, y_test)
-# for i,a in enumerate(axes):
-#   a.set_title("LeaveOrNot")
-#   a.set_xticklabels([])
-#   a.get_yaxis().set_visible(False)
-# axes[-1].set_xticklabels("Variables")
-plt.show()
+#Performance metric of the model
+accuracy = accuracy_score(y_test, y_pred)
+report = classification_report(y_test, y_pred)
+matrix = confusion_matrix(y_test, y_pred)
+print("Model Accuracy: ", accuracy)
+print("Classification report: \n", report)
+print("Confusion Matrix: \n", matrix)
